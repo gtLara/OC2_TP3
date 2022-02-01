@@ -1,3 +1,4 @@
+"""Define classe Cache."""
 from math import log, ceil
 
 class Cache:
@@ -11,6 +12,7 @@ class Cache:
         # self.n_bits_secondary_address = self.n_set_bits + self.n_block_offset_bits #TODO: understand whats up here
 
     def decompose_address(self, raw_address):
+        """Decompõe endereços de CPU em campos relevantes."""
 
         byte_offset = raw_address[-2:]
 
