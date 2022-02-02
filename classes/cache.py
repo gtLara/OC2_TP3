@@ -1,5 +1,6 @@
 """Define classe Cache."""
 from math import log, ceil
+from entry import Entry
 
 class Cache:
 
@@ -11,22 +12,44 @@ class Cache:
         self.n_block_offset_bits = ceil(log(block_size, 2))
         # self.n_bits_secondary_address = self.n_set_bits + self.n_block_offset_bits #TODO: understand whats up here
 
-    def decompose_address(self, raw_address):
+        self.entries = {}
+
+        for block_index in range(n_blocks): # TODO: check
+            binary_string_index = "{0:#b}".format(block_index).replace("0b", "")
+            padding = "0" * (self.n_set_bits - len(binary_string_index))
+            binary_string_index = padding + binary_string_index
+            self.entries[binary_string_index] = Entry(self.n_set_bits, block_size)
+
+    def decompose_address(self, cpu_address):
         """Decompõe endereços de CPU em campos relevantes."""
 
-        byte_offset = raw_address[-2:]
+        byte_offset = cpu_address[-2:]
 
         bo_lower = -2
         bo_upper = -(self.n_block_offset_bits+2)
-        block_offset = raw_address[bo_upper:bo_lower]
+        block_offset = cpu_address[bo_upper:bo_lower]
 
         index_lower = bo_upper
         index_upper = bo_upper - self.n_set_bits
 
-        index = raw_address[index_upper:index_lower]
+        index = cpu_address[index_upper:index_lower]
 
         tag_lower = index_upper
 
-        tag = raw_address[:tag_lower] #TODO: understand whats up here
+        tag = cpu_address[:tag_lower] #TODO: understand whats up here
 
         return byte_offset, block_offset, index, tag
+
+    def read(self, cpu_address): # TODO: check
+
+        byte_offset, block_offset, index, tag = self.decompose_address(cpu_address)
+        entry = self.entries[index]
+
+        if entry.valid_bit and entry.tag == tag: # hit
+            word = entry.block[block_offset]
+
+            return word
+
+        else:
+            pass
+            # memory_system.get_data(cpu_address)
