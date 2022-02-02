@@ -36,19 +36,32 @@ class Cache:
 
         return byte_offset, block_offset, index, tag
 
-    def read(self, cpu_address): # TODO: check
+    def read(self, cpu_address, memory, verb=True): # TODO: check
 
         byte_offset, block_offset, index, tag = self.decompose_address(cpu_address)
         entry = self.entries[index]
 
         if entry.valid_bit and entry.tag == tag: # hit
+            if verb:
+                print("cache read HIT")
+
             word = entry.block[block_offset]
 
-            return word
-
         else:
-            pass
-            # memory_system.get_data(cpu_address)
+            if verb:
+                print("cache read MISS")
+
+            memory_address = cpu_address[-(memory.address_size):]
+            word = memory.read(memory_address)
+
+            _, block_offset, index, tag = self.decompose_address(cpu_address)
+
+            self.entries[index].valid_bit = 1
+            self.entries[index].dirty_bit = 0
+            self.entries[index].tag = tag
+            self.entries[index].block[block_offset] = word
+
+        return word
 
     def write(self, cpu_address, data):
         pass
