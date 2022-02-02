@@ -1,5 +1,4 @@
 from utils import create_storage, create_random_word
-import random
 from math import log
 
 class PhysicalMemory:

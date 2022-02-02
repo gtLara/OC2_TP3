@@ -1,4 +1,5 @@
 from math import log
+import random
 
 def create_random_word(size=32):
 
