@@ -18,10 +18,9 @@ class Entry:
         self.valid_bit = 0
         self.index = 0
         self.block = {}
+        self.tag = 0
 
         if random:
-            self.block["tags"] = create_storage(block_size)
-            self.block["words"] = create_storage(block_size, create_random_word)
+            self.block = create_storage(block_size, create_random_word)
         else:
-            self.block["tags"] = create_storage(block_size)
-            self.block["words"] = create_storage(block_size)
+            self.block = create_storage(block_size)
