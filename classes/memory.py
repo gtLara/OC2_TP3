@@ -1,14 +1,6 @@
-from utils import create_storage
+from utils import create_storage, create_random_word
 import random
 from math import log
-
-def create_random_word(size=32):
-
-    word = ""
-    for i in range(size):
-        word += str(random.randint(0, 1))
-
-    return word
 
 class PhysicalMemory:
 

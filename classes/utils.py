@@ -1,5 +1,13 @@
 from math import log
 
+def create_random_word(size=32):
+
+    word = ""
+    for i in range(size):
+        word += str(random.randint(0, 1))
+
+    return word
+
 def create_storage(n_items, initial_data="0"):
 
     data = {}
