@@ -9,6 +9,7 @@ class Cache:
 
         assert not (log(n_blocks, 2) % 1) # assert n_blocks is power of 2
 
+        self.block_size = block_size
         self.n_set_bits = int(log(n_blocks, 2))
         self.n_block_offset_bits = ceil(log(block_size, 2))
         # self.n_bits_secondary_address = self.n_set_bits + self.n_block_offset_bits #TODO: understand whats up here
@@ -51,17 +52,16 @@ class Cache:
             if verb:
                 print("cache read MISS")
 
-            memory_address = cpu_address[-(memory.address_size):]
-            word = memory.read(memory_address)
-
-            _, block_offset, index, tag = self.decompose_address(cpu_address)
 
             self.entries[index].valid_bit = 1
             self.entries[index].dirty_bit = 0
-            # self.entries[index].tag = tag
-            self.entries[index].block["words"][block_offset] = word
+            self.entries[index].tag = tag
 
-        return word
+            memory_address = cpu_address[-(memory.address_size):]
+            block = memory.read(memory_address, spread=self.block_size)
+            self.entries[index].block = block
+
+            return block
 
     def write(self, cpu_address, data):
         pass
