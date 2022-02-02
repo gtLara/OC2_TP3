@@ -9,6 +9,10 @@ def create_storage(n_items, initial_data="0"):
         binary_string_index = "{0:#b}".format(item_index).replace("0b", "")
         padding = "0" * (n_index_bits - len(binary_string_index))
         binary_string_index = padding + binary_string_index
-        data[binary_string_index] = initial_data
+
+        if callable(initial_data): # case in which initial_data is function
+            data[binary_string_index] = initial_data()
+        else:
+            data[binary_string_index] = initial_data
 
     return data
