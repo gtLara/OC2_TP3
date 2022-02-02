@@ -1,7 +1,7 @@
 """Define classe Cache."""
 from math import log, ceil
-from entry import Entry
-from utils import create_storage
+from classes.entry import Entry
+from classes.utils import create_storage
 
 class Cache:
 
@@ -58,8 +58,8 @@ class Cache:
 
             self.entries[index].valid_bit = 1
             self.entries[index].dirty_bit = 0
-            self.entries[index].tag = tag
-            self.entries[index].block[block_offset] = word
+            # self.entries[index].tag = tag
+            self.entries[index].block["words"][block_offset] = word
 
         return word
 
