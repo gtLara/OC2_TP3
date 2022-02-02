@@ -9,10 +9,9 @@ from math import log
 
 class Entry:
 
-    def __init__(self, n_index_bits, block_size):
+    def __init__(self, n_index_bits=6, block_size=4):
 
         self.n_index_bits = n_index_bits
-        # self.n_tag_bits = n_tag_bits
         self.block_size = block_size
 
         self.dirty_bit = 0
