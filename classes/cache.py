@@ -1,6 +1,7 @@
 """Define classe Cache."""
 from math import log, ceil
 from entry import Entry
+from utils import create_storage
 
 class Cache:
 
@@ -12,13 +13,8 @@ class Cache:
         self.n_block_offset_bits = ceil(log(block_size, 2))
         # self.n_bits_secondary_address = self.n_set_bits + self.n_block_offset_bits #TODO: understand whats up here
 
-        self.entries = {}
-
-        for block_index in range(n_blocks): # TODO: check
-            binary_string_index = "{0:#b}".format(block_index).replace("0b", "")
-            padding = "0" * (self.n_set_bits - len(binary_string_index))
-            binary_string_index = padding + binary_string_index
-            self.entries[binary_string_index] = Entry(self.n_set_bits, block_size)
+        self.entries = create_storage(n_blocks,
+                                      Entry(self.n_set_bits, block_size))
 
     def decompose_address(self, cpu_address):
         """Decompõe endereços de CPU em campos relevantes."""
@@ -53,3 +49,6 @@ class Cache:
         else:
             pass
             # memory_system.get_data(cpu_address)
+
+    def write(self, cpu_address, data):
+        pass
