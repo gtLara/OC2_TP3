@@ -14,6 +14,8 @@ class PhysicalMemory:
 
     def __init__(self, n_words=1024, word_size=32, random=True):
 
+        self.address_size = int(log(n_words, 2))
+
         if random:
             self.data = create_storage(n_words,
                                        initial_data=create_random_word)
