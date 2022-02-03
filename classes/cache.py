@@ -17,6 +17,7 @@ class Cache:
         self.entries = create_storage(n_blocks,
                                       Entry(self.n_set_bits, block_size))
 
+
     def decompose_address(self, cpu_address):
         """Decompõe endereços de CPU em campos relevantes."""
 
@@ -65,3 +66,12 @@ class Cache:
 
     def write(self, cpu_address, data):
         pass
+
+    def __str__(self):
+
+        cache_vis = " INDEX | V | D | TAG |  DATA\n"
+
+        for entry in self.entries.values():
+            cache_vis += (str(entry)+"\n")
+
+        return cache_vis
