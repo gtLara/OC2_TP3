@@ -24,3 +24,12 @@ class Entry:
             self.block = create_storage(block_size, create_random_word)
         else:
             self.block = create_storage(block_size)
+
+    def __str__(self):
+
+        hex_block = {}
+
+        for key, value in self.block.items():
+            hex_block[key] = hex(int(value, 2))
+
+        return f"{self.index} | {self.valid_bit} {self.dirty_bit} {self.tag} {hex_block}"
