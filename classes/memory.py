@@ -10,7 +10,7 @@ class PhysicalMemory:
 
         if random:
             self.data = create_storage(n_words,
-                                       initial_data=create_random_word)
+                                       init_data=create_random_word)
         else:
             self.data = create_storage(n_words)
 
@@ -35,3 +35,12 @@ class PhysicalMemory:
     def write(self, address, data):
 
         self.data[address] = data
+
+    def __str__(self):
+
+        mem_viz = " INDEX     | DATA\n"
+
+        for k, v in self.data.items():
+            mem_viz += f"{k} | {hex(int(v, 2))}\n"
+
+        return mem_viz
