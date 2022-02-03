@@ -11,6 +11,8 @@ def int_2_padded_bin(integer, pad_up_to):
 
     """
 
+    # binary_string = format(8, f"0{pad_up_to}b"} # TODO: switch to this !!
+
     binary_string = "{0:#b}".format(integer).replace("0b", "")
     padding = "0" * (pad_up_to - len(binary_string))
     binary_string = padding + binary_string
@@ -25,18 +27,22 @@ def create_random_word(size=32):
 
     return word
 
-def create_storage(n_items, initial_data="0"):
+def create_storage(n_items, init_data="0", *args):
 
     data = {}
     n_index_bits = int(log(n_items, 2))
 
     for item_index in range(n_items):
 
-        binary_string_index = int_2_padded_bin(item_index, n_index_bits)
+        bin_string_index = int_2_padded_bin(item_index, n_index_bits)
 
-        if callable(initial_data): # case in which initial_data is function
-            data[binary_string_index] = initial_data()
+        if callable(init_data): # case in which init_data is function
+            if args:
+                data[bin_string_index] = init_data(*args, bin_string_index)
+            else:
+                data[bin_string_index] = init_data()
+
         else:
-            data[binary_string_index] = initial_data
+            data[bin_string_index] = init_data
 
     return data
