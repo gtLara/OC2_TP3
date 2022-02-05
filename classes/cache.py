@@ -50,7 +50,7 @@ class Cache:
 
         else:
             if verb:
-                print("cache read MISS")
+                print("cache read MISS") # TODO: improve this case !!
 
 
             self.entries[index].valid_bit = 1
@@ -60,8 +60,10 @@ class Cache:
             memory_address = cpu_address[-(memory.address_size):]
             block = memory.read_block(memory_address, block_size=self.block_size)
             self.entries[index].block = block
+            word = block["00"]
 
-            return block
+
+        return word
 
     def write_entry(self, data, index, block_offset, dirty, tag):
 
