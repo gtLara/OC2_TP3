@@ -73,11 +73,22 @@ class Cache:
             if verb:
                 print("cache write HIT")
 
-            if entry.dirty_bit == 0 or entry.dirty_bit == 1: #write thru
+            if entry.dirty_bit == 0: # case in which cache block corresponds to memory block
 
-                memory.write(memory_address, data)
                 self.entries[index].valid_bit = 1
-                self.entries[index].dirty_bit = 0
+                self.entries[index].dirty_bit = 1 # indicates that cache block does not represent memory
+                self.entries[index].block[block_offset] = data
+
+            else:
+
+                # writing entire block to memory
+
+                for block_off, word in self.entries[index].items():
+                    memory_address = index + block_off
+                    memory.write(memory_address, word)
+
+                self.entries[index].valid_bit = 1
+                self.entries[index].dirty_bit = 0 # indicates that cache block corresponds to memory
                 self.entries[index].block[block_offset] = data
 
         else:
