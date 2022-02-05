@@ -1,5 +1,6 @@
 """Define classe Cache."""
 from math import log, ceil
+import copy
 from classes.entry import Entry
 from classes.utils import create_storage
 
@@ -57,48 +58,47 @@ class Cache:
             self.entries[index].tag = tag
 
             memory_address = cpu_address[-(memory.address_size):]
-            block = memory.read(memory_address, spread=self.block_size)
+            block = memory.read_block(memory_address, block_size=self.block_size)
             self.entries[index].block = block
 
             return block
 
+    def write_entry(self, data, index, block_offset, dirty, tag):
+
+        wentry = self.entries[index]
+        wentry.block[block_offset] = data
+        wentry.valid_bit = 1
+        wentry.dirty_bit = dirty
+        wentry.tag = tag
+
     def write(self, cpu_address, data, memory, verb=True):
 
         block_offset, index, tag = self.decompose_address(cpu_address)
-        print(index)
         entry = self.entries[index]
         memory_address = cpu_address[-(memory.address_size):]
 
         if entry.valid_bit and entry.tag == tag: # hit
             if verb:
-                print("cache write HIT")
+                print("cache WRITE HIT")
 
             if entry.dirty_bit == 0: # case in which cache block corresponds to memory block
 
-                self.entries[index].valid_bit = 1
-                self.entries[index].dirty_bit = 1 # indicates that cache block does not represent memory
-                self.entries[index].block[block_offset] = data
+                dirty = 1 # indicates that cache block does not represent memory
+                self.write_entry(data, index, block_offset, dirty, tag)
 
-            else:
+            else: # case in which cache block does not mirror memory
 
-                # writing entire block to memory
-
-                for block_off, word in self.entries[index].items():
-                    memory_address = index + block_off
-                    memory.write(memory_address, word)
-
-                self.entries[index].valid_bit = 1
-                self.entries[index].dirty_bit = 0 # indicates that cache block corresponds to memory
-                self.entries[index].block[block_offset] = data
+                dirty = 0 # indicates that cache block corresponds to memory
+                self.write_entry(data, index, block_offset, dirty, tag)
+                memory.write_block(index, tag, entry)
 
         else:
             if verb:
-                print("cache read MISS")
+                print("cache WRITE MISS")
 
-                memory.write(memory_address, data)
-                self.entries[index].valid_bit = 1
-                self.entries[index].dirty_bit = 0
-                self.entries[index].block[block_offset] = data
+                dirty = 0
+                self.write_entry(data, index, block_offset, dirty, tag)
+                memory.write_block(index, tag, entry)
 
     def __str__(self):
 
@@ -108,3 +108,10 @@ class Cache:
             cache_vis += (str(entry)+"\n")
 
         return cache_vis
+
+    def __getitem__(self, slice_key):
+
+        sliced_cache = copy.deepcopy(self)
+        new_entries = dict(list(self.entries.items())[slice_key])
+        sliced_cache.entries = new_entries
+        return sliced_cache
