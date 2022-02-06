@@ -1,20 +1,28 @@
 import sys
+import os
+# os.system('color') # to get colored printing working on windows
+from termcolor import colored
 from collections import Counter
 from classes.system import MemorySystem
 
 try:
     fn = sys.argv[1]
 except IndexError:
-    print("Nome de arquivo faltando!")
+    print(colored("Nome de arquivo faltando!", "red"))
     print("Execute python test.py <nome_arquivo_teste>")
     exit()
 
 memory_system = MemorySystem()
 
-with open(f"{fn}", "r") as input_file:
-    lines = input_file.readlines()
+try:
+    with open(f"{fn}", "r") as input_file:
+        lines = input_file.readlines()
+except FileNotFoundError:
+    err = f"O arquivo fornecido {fn} não existe ou está com o caminho errado"
+    print(colored(err, "red"))
+    exit()
 
-output_file = open(f"{fn}_output", "w+")
+output_file = open(f"result.txt", "w+")
 output_log = []
 output_lines = ""
 
