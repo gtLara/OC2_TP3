@@ -19,6 +19,7 @@ with open(f"{fn}", "r") as input_file:
     lines = input_file.readlines()
 
 output_file = open(f"{fn}_output", "w+")
+output_file.write("\n"*7)
 
 for line in lines:
 
@@ -35,9 +36,9 @@ for line in lines:
 
     else: # read case
 
-        output_file.write(line.strip()+" R\n")
         address = format(int(split_line[0]), "032b")
-        word = cache.read(address, mem)
+        word, status = cache.read(address, mem)
+        output_file.write(line.strip()+f" {status}\n")
         print(f"value in mem[{address}] is {hex(int(word, 2))}")
         print(cache[0:7])
         print(mem[0:26])

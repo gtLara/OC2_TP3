@@ -43,12 +43,14 @@ class Cache:
         entry = self.entries[index]
 
         if entry.valid_bit and entry.tag == tag: # hit
+            status = "H"
             if verb:
                 print("cache read HIT")
 
             word = entry.block[block_offset]
 
         else:
+            status = "M"
             if verb:
                 print("cache read MISS") # TODO: improve this case !!
 
@@ -62,8 +64,7 @@ class Cache:
             self.entries[index].block = block
             word = block["00"]
 
-
-        return word
+        return word, status
 
     def write_entry(self, data, index, block_offset, dirty, tag):
 
