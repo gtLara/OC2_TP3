@@ -42,7 +42,7 @@ class Cache:
         block_offset, index, tag = self.decompose_address(cpu_address)
         entry = self.entries[index]
 
-        if entry.valid_bit and entry.tag == tag: # hit
+        if entry.valid_bit and entry.tag == tag: # hit, OK
             status = "H"
             if verb:
                 print("cache read HIT")
@@ -59,10 +59,14 @@ class Cache:
             self.entries[index].dirty_bit = 0
             self.entries[index].tag = tag
 
-            memory_address = cpu_address[-(memory.address_size):]
+            memory_address = int(cpu_address[-(memory.address_size):], 2)
+
+            memory_address = memory_address - (memory_address % self.block_size)
+            memory_address = format(memory_address, f"0{memory.address_size}b")
+
             block = memory.read_block(memory_address, block_size=self.block_size)
             self.entries[index].block = block
-            word = block["00"]
+            word = block[block_offset]
 
         return word, status
 
@@ -74,7 +78,7 @@ class Cache:
         wentry.dirty_bit = dirty
         wentry.tag = tag
 
-    def write(self, cpu_address, data, memory, verb=True):
+    def write(self, cpu_address, data, memory, verb=True): # TODO: update miss messages
 
         block_offset, index, tag = self.decompose_address(cpu_address)
         entry = self.entries[index]
