@@ -13,7 +13,6 @@ class Cache:
         self.block_size = block_size
         self.n_set_bits = int(log(n_blocks, 2))
         self.n_block_offset_bits = ceil(log(block_size, 2))
-        # self.n_bits_secondary_address = self.n_set_bits + self.n_block_offset_bits #TODO: understand whats up here
 
         self.entries = create_storage(n_blocks,
                                       Entry,
@@ -33,11 +32,11 @@ class Cache:
 
         tag_lower = index_upper
 
-        tag = cpu_address[:tag_lower] #TODO: understand whats up here
+        tag = cpu_address[:tag_lower]
 
         return block_offset, index, tag
 
-    def read(self, cpu_address, memory, verb=True): # TODO: check
+    def read(self, cpu_address, memory, verb=True):
 
         block_offset, index, tag = self.decompose_address(cpu_address)
         entry = self.entries[index]
@@ -52,8 +51,10 @@ class Cache:
         else:
             status = "M"
             if verb:
-                print("cache read MISS") # TODO: improve this case !!
+                print("cache read MISS")
 
+            if entry.dirty_bit == 1:
+                memory.write_block(index, entry.tag, entry)
 
             self.entries[index].valid_bit = 1
             self.entries[index].dirty_bit = 0
@@ -78,7 +79,7 @@ class Cache:
         wentry.dirty_bit = dirty
         wentry.tag = tag
 
-    def write(self, cpu_address, data, memory, verb=True): # TODO: update miss messages
+    def write(self, cpu_address, data, memory, verb=True):
 
         block_offset, index, tag = self.decompose_address(cpu_address)
         entry = self.entries[index]
@@ -100,12 +101,20 @@ class Cache:
                 memory.write_block(index, tag, entry)
 
         else:
-            if verb:
+            if verb: # think this one through
                 print("cache WRITE MISS")
 
-                dirty = 0
+                memory_address = int(memory_address, 2)
+
+                memory_address = memory_address - (memory_address % self.block_size)
+                memory_address = format(memory_address, f"0{memory.address_size}b")
+
+                block = memory.read_block(memory_address, block_size=self.block_size)
+                self.entries[index].block = block
+
+                dirty = 1
                 self.write_entry(data, index, block_offset, dirty, tag)
-                memory.write_block(index, tag, entry)
+                # memory.write_block(index, tag, entry)
 
     def __str__(self):
 
